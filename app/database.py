@@ -11,11 +11,14 @@ from app.config import get_db_url
 DATABASE_URL = get_db_url()
 
 
+# Создание движка
 engine = create_async_engine(DATABASE_URL)
 async_sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
 
 
-# настройка аннотаций
+# Настройка аннотаций
+# Чтобы не было повторов кода
+# Далее буду использоваться при создании полей моделей
 int_pk = Annotated[int, mapped_column(primary_key=True)]
 created_at = Annotated[datetime, mapped_column(server_default=func.now())]
 updated_at = Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now)]
@@ -23,6 +26,8 @@ str_uniq = Annotated[str, mapped_column(unique=True, nullable=False)]
 str_null_true = Annotated[str, mapped_column(nullable=True)]
 
 
+# Базовый класс
+# От него будут наследоваться все модели
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
