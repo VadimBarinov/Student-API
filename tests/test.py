@@ -32,7 +32,7 @@ def get_student_from_param_id(student_id: int):
 
 
 course = 2
-print(f"\n Test /students/{course} (GET): ")
+print(f"\nTest /students/{course} (GET): ")
 students = get_all_students_with_param(course=2, major=None, enrollment_year=2018)
 for student in students:
     print(student)
@@ -40,14 +40,14 @@ print("-------------------------------------------------------------------------
 
 
 student_id = 2
-print(f"\n Test /student/{student_id} (GET): ")
+print(f"\nTest /student/{student_id} (GET): ")
 student = get_student_from_id(student_id=2)
 print(student)
 print("-----------------------------------------------------------------------------")
 
 
 student_id = 5
-print(f"\n Test /student/?student_id={student_id} (GET): ")
+print(f"\nTest /student/?student_id={student_id} (GET): ")
 student = get_student_from_param_id(student_id=5)
 print(student)
 print("-----------------------------------------------------------------------------")
