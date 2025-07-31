@@ -1,5 +1,3 @@
-from tabnanny import check
-
 from fastapi import FastAPI, Depends, HTTPException
 
 from utils import json_to_dict_list, add_student, upd_student, dell_student

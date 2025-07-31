@@ -2,3 +2,7 @@ fastapi[all]
 requests
 json_db_lite
 pydantic
+alembic
+asyncpg
+sqlalchemy
+pydantic-settings
