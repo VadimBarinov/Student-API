@@ -1,3 +1,5 @@
+# Request Body Student
+# Описывает тело запроса
 class RBStudent:
     # Все параметры необязательные
     # Такая запись эквивалентна Optional[int]

@@ -8,6 +8,7 @@ from sqlalchemy.orm import DeclarativeBase, declared_attr, mapped_column, Mapped
 from app.config import get_db_url
 
 
+# url для подключения к базе данных
 DATABASE_URL = get_db_url()
 
 

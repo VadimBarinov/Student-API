@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
 from datetime import date, datetime
 
 
+# Модель Pydantic дял описания студента
 class SStudent(BaseModel):
     # Тем самым Pydantic понимает явно, что работать он будет с аргументами базы данных.
     model_config = ConfigDict(from_attributes=True)
@@ -29,8 +30,10 @@ class SStudent(BaseModel):
                         description="Курс должен быть в диапазоне от 1 до 5",)
     special_notes: Optional[str] = Field(default=None, max_length=500,
                                          description="Дополнительные заметки, не более 500 символов",)
+    # Дополнительное поле, используется для отображения названия факультета
     major: Optional[str] = Field(..., description="Название факультета")
 
+    # Валидатор поля
     @field_validator("phone_number")
     @classmethod
     def validate_phone_number(cls, values: str) -> str:
@@ -38,6 +41,7 @@ class SStudent(BaseModel):
             raise ValueError("Номер телефона должен начинаться с + и содержать от 1 до 15 цифр")
         return values
 
+    # Валидатор даты рождения
     @field_validator("date_of_birth")
     @classmethod
     def validate_date_of_birth(cls, values: date):

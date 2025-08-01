@@ -11,5 +11,6 @@ def home_page():
     return {"message": "Привет, Друг!"}
 
 
+# Подключение роутеров
 app.include_router(router_students)
 app.include_router(router_majors)
