@@ -1,6 +1,6 @@
 fastapi[all]
 requests
-json_db_lite
+httpx
 pydantic
 alembic
 asyncpg

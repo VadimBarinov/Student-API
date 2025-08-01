@@ -1,7 +1,8 @@
-from sqlalchemy import ForeignKey, text, Text
+from sqlalchemy import ForeignKey, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base, str_uniq, int_pk, str_null_true
 from datetime import date
+from app.majors.models import Major
 
 
 # Модель Student для описания студента
@@ -20,6 +21,7 @@ class Student(Base):
     major_id: Mapped[int] = mapped_column(ForeignKey("majors.id"), nullable=False)
 
     # Foreign Key. В качестве внешнего ключа используется поле id модели Major
+    # Определяем отношения: один студент имеет один факультет
     major: Mapped["Major"] = relationship("Major", back_populates="students")
 
     # Метод для корректного отображения объекта класса в качестве строки
@@ -32,19 +34,18 @@ class Student(Base):
     def __repr__(self):
         return str(self)
 
-
-# Модель Major для описания направления обучения
-class Major(Base):
-    # В некоторых полях класса используются аннотации, сформированные в файле database.py
-    id: Mapped[int_pk]
-    major_name: Mapped[str_uniq]
-    major_description: Mapped[str_null_true]
-    count_students: Mapped[int] = mapped_column(server_default=text('0'))
-
-    # Метод для корректного отображения объекта класса в качестве строки
-    def __str__(self):
-        return f"{self.__class__.__name__}(id={self.id}, major_name={self.major_name!r})"
-
-    # Возвращает строковое представление объекта
-    def __repr__(self):
-        return str(self)
+    # Метод преобразует все полученные данные в обычный словарь
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "phone_number": self.phone_number,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "date_of_birth": self.date_of_birth,
+            "email": self.email,
+            "address": self.address,
+            "enrollment_year": self.enrollment_year,
+            "course": self.course,
+            "special_notes": self.special_notes,
+            "major_id": self.major_id,
+        }

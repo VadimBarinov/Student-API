@@ -13,7 +13,7 @@ DATABASE_URL = get_db_url()
 
 # Создание движка
 engine = create_async_engine(DATABASE_URL)
-async_sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
+async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
 # Настройка аннотаций
