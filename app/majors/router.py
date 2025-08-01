@@ -9,7 +9,7 @@ router = APIRouter(
 )
 
 
-@router.post("/add", summary="Добавление нового факультета")
+@router.post("/add/", summary="Добавление нового факультета")
 async def add_major(major: SMajorsAdd) -> dict:
     check_major = await MajorsDAO.add(**major.model_dump())
     if check_major:
