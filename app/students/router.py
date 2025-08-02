@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
-
 from app.students.dao import StudentDAO
 from app.students.rb import RBStudent
-from app.students.schemas import SStudent
+from app.students.schemas import SStudent, SStudentAdd
 
 # Создание роутера
 # prefix устанавливает префикс для всех маршрутов роутера
@@ -18,7 +17,7 @@ router = APIRouter(
 # Начало асинхронной функции
 # Асинхронность позволяет обрабатывать несколько запросов одновременно, не блокируя другие операции
 async def get_all_students(request_body: RBStudent = Depends()) -> list[SStudent]:
-        return await StudentDAO.find_all(**request_body.to_dict())
+        return await StudentDAO.find_students(**request_body.to_dict())
 
 
 # получение студента по id
@@ -40,3 +39,26 @@ async def get_student_by_filter(request_body: RBStudent = Depends()) -> SStudent
     if result is None:
         return {"message": f"Студент с указанными вами параметрами не найден!"}
     return result
+
+
+@router.post("/add/", summary="Добавить нового студента")
+async def add_student(student: SStudentAdd) -> dict:
+    check_student = await StudentDAO.add_student(**student.model_dump())
+    if check_student:
+        return {"message": "Студент успешно добавлен!", "student": student}
+    else:
+        return {"message": "Ошибка при добавлении студента!"}
+
+
+@router.delete("/delete/{id}/", summary="Удаление студента по ID")
+async def delete_student_by_id(student_id: int) -> dict:
+    check_student = await StudentDAO.delete_student_by_id(student_id=student_id)
+    if check_student:
+        return {"message": f"Студент с ID {student_id} удален!"}
+    else:
+        return {"message": "Ошибка при удалении студента!"}
+
+# ----------------------------------------------------------------------------------
+# Нужно добавить эндпоинты:
+# PUT на изменение записи
+# ----------------------------------------------------------------------------------

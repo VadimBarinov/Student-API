@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, update as sqlalchemy_update, delete as sqlalchemy_delete
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import async_session_maker
@@ -60,3 +60,51 @@ class BaseDAO:
                     raise e
                 # Возвращаем созданный экземпляр.
                 return new_instance
+
+    # Метод для изменения поля таблицы
+    @classmethod
+    async def update(cls, filter_by, **values):
+        # Создаем асинхронную сессию
+        async with async_session_maker() as session:
+            # Начинаем транзакцию
+            async with session.begin():
+                # Запрос на обновление записей
+                query = (
+                    sqlalchemy_update(cls.model)
+                    # Добавляются условия фильтрации, чтобы обновить только те записи,
+                    # которые соответствуют заданным условиям
+                    .where(*[getattr(cls.model, k) == v for k, v in filter_by.items()])
+                    # Устанавливаются новые значения для обновляемых записей
+                    .values(**values)
+                    # Опция, чтобы синхронизировать состояние сессии с базой данных после выполнения запроса
+                    .execution_options(synchronize_session="fetch")
+                )
+                # Выполнение запроса
+                result = await session.execute(query)
+                try:
+                    # Сохранение изменений в базе данных
+                    await session.commit()
+                except SQLAlchemyError as e:
+                    # Транзакция откатывается, если возникает ошибка
+                    await session.rollback()
+                    raise e
+                # Возвращает количество обновленных строк
+                return result.rowcount
+
+    # Метод для удаления
+    @classmethod
+    async def delete(cls, delete_all: bool = False, **filter_by):
+        # Проверка на наличие параметров
+        if delete_all == False and not filter_by:
+            raise ValueError("Необходимо указать хотя бы один параметр для удаления.")
+
+        async with async_session_maker() as session:
+            async with session.begin():
+                query = sqlalchemy_delete(cls.model).filter_by(**filter_by)
+                result = await session.execute(query)
+                try:
+                    await session.commit()
+                except SQLAlchemyError as e:
+                    await session.rollback()
+                    raise e
+                return result.rowcount
