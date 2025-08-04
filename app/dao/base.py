@@ -28,17 +28,17 @@ class BaseDAO:
         async with async_session_maker() as session:
             query = select(cls.model).filter_by(id=data_id)
             result = await session.execute(query)
-            return result.scalar_one_or_none()
+            return result.scalars().first()
 
     # Поиск по фильтру
     # Фильтр передается в виде списка именованных аргументов
     # Вернет None, если ничего не нашел
     @classmethod
     async def find_one_or_none(cls, **filter_by):
-        async with async_session_maker as session:
+        async with async_session_maker() as session:
             query = select(cls.model).filter_by(**filter_by)
             result = await session.execute(query)
-            return result.scalar_one_or_none()
+            return result.scalars().first()
 
     # Метод для добавления новой записи в таблицу
     @classmethod
