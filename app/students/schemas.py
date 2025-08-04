@@ -33,6 +33,8 @@ class SStudent(BaseModel):
     # Дополнительное поле, используется для отображения названия факультета
     major: Optional[str] = Field(..., description="Название факультета")
 
+    study_group: Optional[str] = Field(..., description="Название группы")
+
     # Валидатор поля
     @field_validator("phone_number")
     @classmethod

@@ -18,7 +18,7 @@ router = APIRouter(
 # Асинхронность позволяет обрабатывать несколько запросов одновременно, не блокируя другие операции
 async def get_all_students(request_body: RBStudent = Depends()) -> list[SStudent] | dict:
     check_student = await StudentDAO.find_students(**request_body.to_dict())
-    if check_student is None:
+    if check_student is None or len(check_student) == 0:
         return {"message": f"Студенты не найдены!"}
     return check_student
 

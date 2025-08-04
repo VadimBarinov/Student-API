@@ -11,7 +11,7 @@ router = APIRouter(
 @router.get("/", summary="Получить все факультеты по фильтру")
 async def get_all_majors(request_body: RBMajor = Depends()) -> list[SMajorGet] | dict:
     check_major = await MajorsDAO.find_all(**request_body.to_dict())
-    if check_major is None:
+    if check_major is None or len(check_major) == 0:
         return {"message": f"Факультеты не найдены!"}
     return check_major
 

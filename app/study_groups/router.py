@@ -14,7 +14,7 @@ router = APIRouter(
 @router.get("/", summary="Получить все группы по фильтру")
 async def get_all_study_groups(request_body: RBStudyGroup = Depends()) -> list[SStudyGroupGet] | dict:
     check_group = await StudyGroupDAO.find_all(**request_body.to_dict())
-    if check_group is None:
+    if check_group is None or len(check_group) == 0:
         return {"message": "Группы не найдены!"}
     return check_group
 

@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base, str_uniq, int_pk, str_null_true
 from datetime import date
 from app.majors.models import Major
+from app.study_groups.models import StudyGroup
 
 
 # Модель Student для описания студента
@@ -19,10 +20,12 @@ class Student(Base):
     course: Mapped[int]
     special_notes: Mapped[str_null_true]
     major_id: Mapped[int] = mapped_column(ForeignKey("majors.id"), nullable=False)
+    study_group_id: Mapped[int] = mapped_column(ForeignKey("studygroups.id"), nullable=False)
 
     # Foreign Key. В качестве внешнего ключа используется поле id модели Major
     # Определяем отношения: один студент имеет один факультет
     major: Mapped["Major"] = relationship("Major", back_populates="students")
+    study_group: Mapped["StudyGroup"] = relationship("StudyGroup", back_populates="students")
 
     # Метод для корректного отображения объекта класса в качестве строки
     def __str__(self):
