@@ -16,6 +16,8 @@ class SStudent(BaseModel):
                             description="Имя студента, от 1 до 50 символов",)
     last_name: str = Field(default=..., min_length=1, max_length=50,
                            description="Фамилия студента, от 1 до 50 символов",)
+    patronymic: str = Field(default=..., min_length=1, max_length=50,
+                           description="Отчество студента, от 1 до 50 символов",)
     date_of_birth: date = Field(default=...,
                                 description="Дата рождения студента в формате ГГГГ-ММ-ДД",)
     email: EmailStr = Field(default=...,
@@ -26,6 +28,8 @@ class SStudent(BaseModel):
                                  description="Год поступления должен быть не меньше 2002",)
     major_id: int = Field(default=..., ge=1,
                          description="ID специальности студента",)
+    study_group_id: int = Field(default=..., ge=1,
+                         description="ID группы студента",)
     course: int = Field(default=..., ge=1, le=5,
                         description="Курс должен быть в диапазоне от 1 до 5",)
     special_notes: Optional[str] = Field(default=None, max_length=500,
@@ -61,6 +65,8 @@ class SStudentAdd(BaseModel):
                             description="Имя студента, от 1 до 50 символов", )
     last_name: str = Field(default=..., min_length=1, max_length=50,
                            description="Фамилия студента, от 1 до 50 символов", )
+    patronymic: str = Field(default=..., min_length=1, max_length=50,
+                           description="Отчество студента, от 1 до 50 символов",)
     date_of_birth: date = Field(default=...,
                                 description="Дата рождения студента в формате ГГГГ-ММ-ДД", )
     email: EmailStr = Field(default=...,
@@ -71,6 +77,8 @@ class SStudentAdd(BaseModel):
                                  description="Год поступления должен быть не меньше 2002", )
     major_id: int = Field(default=..., ge=1,
                           description="ID специальности студента", )
+    study_group_id: int = Field(default=..., ge=1,
+                                description="ID группы студента", )
     course: int = Field(default=..., ge=1, le=5,
                         description="Курс должен быть в диапазоне от 1 до 5", )
     special_notes: Optional[str] = Field(default=None, max_length=500,

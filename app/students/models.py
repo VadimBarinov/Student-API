@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Text
+from sqlalchemy import ForeignKey, Text, text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base, str_uniq, int_pk, str_null_true
 from datetime import date
@@ -13,6 +13,7 @@ class Student(Base):
     phone_number: Mapped[str_uniq]
     first_name: Mapped[str]
     last_name: Mapped[str]
+    patronymic: Mapped[str]
     date_of_birth: Mapped[date]
     email: Mapped[str_uniq]
     address: Mapped[str] = mapped_column(Text, nullable=False)
@@ -44,6 +45,7 @@ class Student(Base):
             "phone_number": self.phone_number,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "patronymic": self.patronymic,
             "date_of_birth": self.date_of_birth,
             "email": self.email,
             "address": self.address,
@@ -51,4 +53,5 @@ class Student(Base):
             "course": self.course,
             "special_notes": self.special_notes,
             "major_id": self.major_id,
+            "study_group_id": self.study_group_id,
         }
