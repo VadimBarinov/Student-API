@@ -100,7 +100,10 @@ class BaseDAO:
 
         async with async_session_maker() as session:
             async with session.begin():
-                query = sqlalchemy_delete(cls.model).filter_by(**filter_by)
+                if delete_all:
+                    query = sqlalchemy_delete(cls.model)
+                else:
+                    query = sqlalchemy_delete(cls.model).filter_by(**filter_by)
                 result = await session.execute(query)
                 try:
                     await session.commit()
