@@ -18,6 +18,7 @@ from app.database import DATABASE_URL, Base
 from app.students.models import Student
 from app.majors.models import Major
 from app.study_groups.models import StudyGroup
+from app.weekdays.models import Weekday
 
 # ------------------------------------------------------------------------------
 # this is the Alembic Config object, which provides
