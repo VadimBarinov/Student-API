@@ -19,6 +19,7 @@ from app.students.models import Student
 from app.majors.models import Major
 from app.study_groups.models import StudyGroup
 from app.weekdays.models import Weekday
+from app.subjects.models import Subject
 
 # ------------------------------------------------------------------------------
 # this is the Alembic Config object, which provides
