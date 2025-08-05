@@ -4,6 +4,7 @@ from app.majors.router import router as router_majors
 from app.study_groups.router import router as router_study_groups
 from app.weekdays.router import router as router_weekdays
 from app.subjects.router import router as router_subjects
+from app.teachers.router import router as router_teachers
 
 
 app = FastAPI()
@@ -20,3 +21,4 @@ app.include_router(router_majors)
 app.include_router(router_study_groups)
 app.include_router(router_weekdays)
 app.include_router(router_subjects)
+app.include_router(router_teachers)

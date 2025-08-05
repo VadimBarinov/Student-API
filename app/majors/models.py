@@ -13,6 +13,7 @@ class Major(Base):
 
     # Определяем отношения: один факультет может иметь много студентов
     students: Mapped[list["Student"]] = relationship("Student", back_populates="major")
+    teachers: Mapped[list["Teacher"]] = relationship("Teacher", back_populates="major")
 
     # Метод для корректного отображения объекта класса в качестве строки
     def __str__(self):
