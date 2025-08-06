@@ -9,6 +9,7 @@ class StudyGroup(Base):
     count_students: Mapped[int] = mapped_column(server_default=text('0'))
 
     students: Mapped[list["Student"]] = relationship("Student", back_populates="study_group")
+    lessons: Mapped[list["Lesson"]] = relationship("Lesson", back_populates="study_group")
 
     def __str__(self):
         return (f"{self.__class__.__name__}("

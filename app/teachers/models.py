@@ -19,6 +19,7 @@ class Teacher(Base):
     major_id: Mapped[int] = mapped_column(ForeignKey("majors.id"), nullable=False)
 
     major: Mapped["Major"] = relationship("Major", back_populates="teachers")
+    lessons: Mapped[list["Lesson"]] = relationship("Lesson", back_populates="teacher")
 
     def __str__(self):
         return (f"{self.__class__.__name__}(id={self.id}, "

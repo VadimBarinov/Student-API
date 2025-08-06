@@ -1,10 +1,12 @@
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, relationship
 from app.database import Base, int_pk, str_uniq
 
 
 class Subject(Base):
     id: Mapped[int_pk]
     name: Mapped[str_uniq]
+
+    lessons: Mapped[list["Lesson"]] = relationship("Lesson", back_populates="subject")
 
 
     def __str__(self):

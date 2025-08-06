@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, relationship
 
 from app.database import Base, int_pk, str_uniq
 
@@ -6,6 +6,8 @@ from app.database import Base, int_pk, str_uniq
 class Weekday(Base):
     id: Mapped[int_pk]
     name: Mapped[str_uniq]
+
+    lessons: Mapped[list["Lesson"]] = relationship("Lesson", back_populates="weekday")
 
     def __str__(self):
         return (
