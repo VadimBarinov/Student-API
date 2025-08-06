@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.teachers.dao import TeacherDAO
 from app.teachers.rb import RBTeacher
-from app.teachers.schemas import STeacherGet
+from app.teachers.schemas import STeacherGet, STeacherAdd, STeacherUpdatePhoneNumber
 
 router = APIRouter(
     prefix="/teachers",
@@ -25,7 +25,32 @@ async def get_teacher_by_id(teacher_id: int) -> STeacherGet | dict:
         return {"message": f"Преподаватель с ID {teacher_id} не найден!"}
     return check_teacher
 
-# Нужно дописать запросы:
-# POST
-# PUT
-# DELETE
+
+@router.post("/add/", summary="Добавить нового преподавателя")
+async def add_teacher(teacher: STeacherAdd) -> dict:
+    check_teacher = await TeacherDAO.add(**teacher.model_dump())
+    if check_teacher:
+        return {"message": "Преподаватель успешно добавлен!", "teacher": teacher}
+    else:
+        return {"message": "Ошибка при добавлении преподавателя"}
+
+
+@router.put("/update_phone_number/", summary="Обновить номер телефона преподавателя")
+async def update_teacher_phone_number(teacher: STeacherUpdatePhoneNumber) -> dict:
+    check_teacher = await TeacherDAO.update(
+        filter_by={"id": teacher.id},
+        phone_number=teacher.phone_number
+    )
+    if check_teacher:
+        return {"message": "Номер телефона преподавателя успешно изменен!", "teacher": teacher}
+    else:
+        return {"message": "Ошибка при изменении номера телефона преподавателя"}
+
+
+@router.delete("/delete_by_id/{teacher_id}/", summary="Удалить преподавателя по ID")
+async def delete_teacher(teacher_id: int) -> dict:
+    check_teacher = await TeacherDAO.delete(id=teacher_id)
+    if check_teacher:
+        return {"message": f"Преподаватель с ID {teacher_id} успешно удален"}
+    else:
+        return {"message": "Ошибка при удалении преподавателя"}

@@ -76,3 +76,15 @@ class STeacherAdd(BaseModel):
         if values and values >= datetime.now().date():
             raise ValueError("Дата рождения должна быть в прошлом")
         return values
+
+
+class STeacherUpdatePhoneNumber(BaseModel):
+    id: int = Field(..., description="ID преподавателя")
+    phone_number: str = Field(..., description="Номер телефона в международном формате, начинающийся с '+'")
+
+    @field_validator("phone_number")
+    @classmethod
+    def validate_phone_number(cls, values: str) -> str:
+        if not re.match(r'^\+\d{1,15}$', values):
+            raise ValueError("Номер телефона должен начинаться с + и содержать от 1 до 15 цифр")
+        return values
