@@ -85,34 +85,3 @@ class StudentDAO(BaseDAO):
             student_data["study_group"] = student_info.study_group.name
 
             return student_data
-
-    # Метод для добавления студентов
-    @classmethod
-    async def add_student(cls, **student_data: dict):
-        async with async_session_maker() as session:
-            async with session.begin():
-                new_student = cls.model(**student_data)
-                session.add(new_student)
-                await session.flush()
-                new_student_id = new_student.id
-                try:
-                    await session.commit()
-                except SQLAlchemyError as e:
-                    session.rollback()
-                    raise e
-                return new_student_id
-
-    # Метод для удаления студента по id
-    @classmethod
-    async def delete_student_by_id(cls, student_id):
-        async with async_session_maker() as session:
-            async with session.begin():
-                query = delete(cls.model).filter_by(id=student_id)
-                result = await session.execute(query)
-
-                try:
-                    session.commit()
-                except SQLAlchemyError as e:
-                    session.rollback()
-                    raise e
-                return result.rowcount

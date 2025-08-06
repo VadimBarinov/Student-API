@@ -46,7 +46,7 @@ async def get_student_by_filter(request_body: RBStudent = Depends()) -> SStudent
 
 @router.post("/add/", summary="Добавить нового студента")
 async def add_student(student: SStudentAdd) -> dict:
-    check_student = await StudentDAO.add_student(**student.model_dump())
+    check_student = await StudentDAO.add(**student.model_dump())
     if check_student:
         return {"message": "Студент успешно добавлен!", "student": student}
     else:
@@ -67,7 +67,7 @@ async def update_student_course(student: SStudentUpdateCourse) -> dict:
 
 @router.delete("/delete_by_id/{student_id}/", summary="Удалить студента по ID")
 async def delete_student_by_id(student_id: int) -> dict:
-    check_student = await StudentDAO.delete_student_by_id(student_id=student_id)
+    check_student = await StudentDAO.delete(id=student_id)
     if check_student:
         return {"message": f"Студент с ID {student_id} удален!"}
     else:
