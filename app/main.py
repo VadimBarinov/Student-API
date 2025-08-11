@@ -6,6 +6,7 @@ from app.routes.weekdays.router import router as router_weekdays
 from app.routes.subjects.router import router as router_subjects
 from app.routes.teachers.router import router as router_teachers
 from app.routes.lessons.router import router as router_lessons
+from app.routes.users.router import router as router_users
 
 
 app = FastAPI()
@@ -17,6 +18,7 @@ def home_page():
 
 
 # Подключение роутеров
+app.include_router(router_users)
 app.include_router(router_students)
 app.include_router(router_majors)
 app.include_router(router_study_groups)
