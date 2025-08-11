@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from app.majors.dao import MajorsDAO
-from app.majors.rb import RBMajor
-from app.majors.schemas import SMajorsAdd, SMajorUpdateDescription, SMajorGet
+from app.routes.majors.dao import MajorsDAO
+from app.routes.majors.rb import RBMajor
+from app.routes.majors.schemas import SMajorsAdd, SMajorUpdateDescription, SMajorGet
 
 router = APIRouter(
     prefix="/majors", tags=["Работа с факультетами",]

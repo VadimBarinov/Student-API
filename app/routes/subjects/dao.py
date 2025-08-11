@@ -1,5 +1,5 @@
 from app.dao.base import BaseDAO
-from app.subjects.models import Subject
+from app.routes.subjects.models import Subject
 
 
 class SubjectDAO(BaseDAO):

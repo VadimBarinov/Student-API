@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from app.lessons.dao import LessonDAO
-from app.lessons.rb import RBLesson
-from app.lessons.schemas import SLessonGet, SLessonAdd, SLessonUpdateAuditorium
+from app.routes.lessons.dao import LessonDAO
+from app.routes.lessons.rb import RBLesson
+from app.routes.lessons.schemas import SLessonGet, SLessonAdd, SLessonUpdateAuditorium
 
 router = APIRouter(
     prefix="/lessons",

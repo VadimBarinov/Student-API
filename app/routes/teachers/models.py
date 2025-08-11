@@ -1,8 +1,8 @@
-from sqlalchemy import ForeignKey, Text, text
+from sqlalchemy import ForeignKey, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base, str_uniq, int_pk, str_null_true
 from datetime import date
-from app.majors.models import Major
+from app.routes.majors.models import Major
 
 
 class Teacher(Base):

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from app.teachers.dao import TeacherDAO
-from app.teachers.rb import RBTeacher
-from app.teachers.schemas import STeacherGet, STeacherAdd, STeacherUpdatePhoneNumber
+from app.routes.teachers.dao import TeacherDAO
+from app.routes.teachers.rb import RBTeacher
+from app.routes.teachers.schemas import STeacherGet, STeacherAdd, STeacherUpdatePhoneNumber
 
 router = APIRouter(
     prefix="/teachers",

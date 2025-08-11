@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from app.subjects.dao import SubjectDAO
-from app.subjects.rb import RBSubject
-from app.subjects.schemas import SSubjectGet, SSubjectAdd, SSubjectUpdateName
+from app.routes.subjects.dao import SubjectDAO
+from app.routes.subjects.rb import RBSubject
+from app.routes.subjects.schemas import SSubjectGet, SSubjectAdd, SSubjectUpdateName
 
 router = APIRouter(
     prefix="/subjects",

@@ -1,12 +1,11 @@
-from sqlalchemy import select, update, event, delete
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import select, update, event
 from sqlalchemy.orm import joinedload
 
 from app.database import async_session_maker
-from app.majors.models import Major
-from app.students.models import Student
+from app.routes.majors.models import Major
+from app.routes.students.models import Student
 from app.dao.base import BaseDAO
-from app.study_groups.models import StudyGroup
+from app.routes.study_groups.models import StudyGroup
 
 
 @event.listens_for(Student, "after_insert")

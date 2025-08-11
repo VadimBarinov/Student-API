@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.weekdays.dao import WeekdayDAO
-from app.weekdays.schemas import SWeekdaysGet
+from app.routes.weekdays.dao import WeekdayDAO
+from app.routes.weekdays.schemas import SWeekdaysGet
 
 
 router = APIRouter(

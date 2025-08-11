@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from app.students.dao import StudentDAO
-from app.students.rb import RBStudent
-from app.students.schemas import SStudent, SStudentAdd, SStudentUpdateCourse
+from app.routes.students.dao import StudentDAO
+from app.routes.students.rb import RBStudent
+from app.routes.students.schemas import SStudent, SStudentAdd, SStudentUpdateCourse
 
 # Создание роутера
 # prefix устанавливает префикс для всех маршрутов роутера

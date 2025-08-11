@@ -3,7 +3,7 @@ from sqlalchemy.orm import joinedload
 
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
-from app.lessons.models import Lesson
+from app.routes.lessons.models import Lesson
 
 
 class LessonDAO(BaseDAO):

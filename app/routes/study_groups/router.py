@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from fastapi.params import Depends
 
-from app.study_groups.dao import StudyGroupDAO
-from app.study_groups.rb import RBStudyGroup
-from app.study_groups.schemas import SStudyGroupAdd, SStudyGroupGet, SStudyGroupUpdateName
+from app.routes.study_groups.dao import StudyGroupDAO
+from app.routes.study_groups.rb import RBStudyGroup
+from app.routes.study_groups.schemas import SStudyGroupAdd, SStudyGroupGet, SStudyGroupUpdateName
 
 router = APIRouter(
     prefix="/study_groups",
