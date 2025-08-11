@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
     DB_PASSWORD: str
+    SECRET_KEY: str
+    ALGORITHM: str
     # Указывается путь на файл .env
     # В нем хранятся параметры подключения к БД
     model_config = SettingsConfigDict(
@@ -23,7 +25,13 @@ settings = Settings()
 # Функция для получения URL для подключения к БД
 # Используется в database.py
 def get_db_url():
-    return(
+    return (
         f"postgresql+asyncpg://{settings.DB_USER}:{settings.DB_PASSWORD}@"
         f"{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
     )
+
+def get_auth_data():
+    return {
+        "secret_key": settings.SECRET_KEY,
+        "algorithm": settings.ALGORITHM,
+    }

@@ -15,6 +15,14 @@ from os.path import dirname, abspath
 sys.path.insert(0, dirname(dirname(abspath(__file__))))
 
 from app.database import DATABASE_URL, Base
+from app.routes.students.models import Student
+from app.routes.majors.models import Major
+from app.routes.study_groups.models import StudyGroup
+from app.routes.weekdays.models import Weekday
+from app.routes.subjects.models import Subject
+from app.routes.teachers.models import Teacher
+from app.routes.lessons.models import Lesson
+from app.routes.users.models import User
 
 # ------------------------------------------------------------------------------
 # this is the Alembic Config object, which provides
