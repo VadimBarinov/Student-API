@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.routes.teachers.dao import TeacherDAO
 from app.routes.teachers.rb import RBTeacher
@@ -14,7 +14,8 @@ router = APIRouter(
 async def get_all_teachers(request_body: RBTeacher = Depends()) -> list[STeacherGet] | dict:
     check_teacher = await TeacherDAO.find_teachers(**request_body.to_dict())
     if check_teacher is None or len(check_teacher) == 0:
-        return {"message": f"Преподаватели не найдены!"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Преподаватели не найдены!")
     return check_teacher
 
 
@@ -22,7 +23,8 @@ async def get_all_teachers(request_body: RBTeacher = Depends()) -> list[STeacher
 async def get_teacher_by_id(teacher_id: int) -> STeacherGet | dict:
     check_teacher = await TeacherDAO.find_full_data(teacher_id)
     if check_teacher is None:
-        return {"message": f"Преподаватель с ID {teacher_id} не найден!"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Преподаватель с ID {teacher_id} не найден!")
     return check_teacher
 
 
@@ -32,7 +34,9 @@ async def add_teacher(teacher: STeacherAdd) -> dict:
     if check_teacher:
         return {"message": "Преподаватель успешно добавлен!", "teacher": teacher}
     else:
-        return {"message": "Ошибка при добавлении преподавателя"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Ошибка при добавлении преподавателя")
+
 
 
 @router.put("/update_phone_number/", summary="Обновить номер телефона преподавателя")
@@ -44,7 +48,8 @@ async def update_teacher_phone_number(teacher: STeacherUpdatePhoneNumber) -> dic
     if check_teacher:
         return {"message": "Номер телефона преподавателя успешно изменен!", "teacher": teacher}
     else:
-        return {"message": "Ошибка при изменении номера телефона преподавателя"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Ошибка при изменении номера телефона преподавателя")
 
 
 @router.delete("/delete_by_id/{teacher_id}/", summary="Удалить преподавателя по ID")
@@ -53,4 +58,5 @@ async def delete_teacher(teacher_id: int) -> dict:
     if check_teacher:
         return {"message": f"Преподаватель с ID {teacher_id} успешно удален"}
     else:
-        return {"message": "Ошибка при удалении преподавателя"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                             detail="Ошибка при удалении преподавателя")

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.routes.students.dao import StudentDAO
 from app.routes.students.rb import RBStudent
 from app.routes.students.schemas import SStudent, SStudentAdd, SStudentUpdateCourse
@@ -19,7 +19,8 @@ router = APIRouter(
 async def get_all_students(request_body: RBStudent = Depends()) -> list[SStudent] | dict:
     check_student = await StudentDAO.find_students(**request_body.to_dict())
     if check_student is None or len(check_student) == 0:
-        return {"message": f"Студенты не найдены!"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Студенты не найдены!")
     return check_student
 
 
@@ -29,7 +30,8 @@ async def get_student_by_id(student_id: int) -> SStudent | dict:
     check_student = await StudentDAO.find_full_data(student_id)
     # Обработчик None
     if check_student is None:
-        return {"message": f"Студент с ID {student_id} не найден!"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Студент с ID {student_id} не найден!")
     return check_student
 
 
@@ -40,7 +42,8 @@ async def get_student_by_filter(request_body: RBStudent = Depends()) -> SStudent
     check_student = await StudentDAO.find_one_or_none(**request_body.to_dict())
     # Обработчик None
     if check_student is None:
-        return {"message": f"Студент с указанными вами параметрами не найден!"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Студент с указанными вами параметрами не найден!")
     return check_student
 
 
@@ -50,7 +53,8 @@ async def add_student(student: SStudentAdd) -> dict:
     if check_student:
         return {"message": "Студент успешно добавлен!", "student": student}
     else:
-        return {"message": "Ошибка при добавлении студента!"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Ошибка при добавлении студента!")
 
 
 @router.put("/update_course/", summary="Обновить курс студента")
@@ -62,7 +66,8 @@ async def update_student_course(student: SStudentUpdateCourse) -> dict:
     if check_student:
         return {"message": "Информация о курсе успешно обновлена!", "student": student}
     else:
-        return {"message": "Ошибка при обновлении информации о курсе студента"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Ошибка при обновлении информации о курсе студента")
 
 
 @router.delete("/delete_by_id/{student_id}/", summary="Удалить студента по ID")
@@ -71,4 +76,5 @@ async def delete_student_by_id(student_id: int) -> dict:
     if check_student:
         return {"message": f"Студент с ID {student_id} удален!"}
     else:
-        return {"message": "Ошибка при удалении студента!"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                             detail="Ошибка при удалении студента!")

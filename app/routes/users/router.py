@@ -4,7 +4,6 @@ from fastapi.params import Depends
 from app.routes.users.auth import get_password_hash, authenticate_user, create_access_token
 from app.routes.users.dao import UserDAO
 from app.routes.users.dependencies import get_current_user, get_current_admin_user
-from app.routes.users.models import User
 from app.routes.users.schemas import SUserRegister, SUserAuth, SUserGet
 
 router = APIRouter(

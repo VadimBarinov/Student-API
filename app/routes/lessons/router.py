@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.routes.lessons.dao import LessonDAO
 from app.routes.lessons.rb import RBLesson
@@ -14,7 +14,8 @@ router = APIRouter(
 async def get_all_lessons_by_filter(lesson: RBLesson = Depends()) -> list[SLessonGet] | dict:
     check_lesson = await LessonDAO.find_lessons(**lesson.to_dict())
     if check_lesson is None or len(check_lesson) == 0:
-        return {"message": "Занятий нет!"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Занятия не найдены!")
     return check_lesson
 
 
@@ -22,7 +23,8 @@ async def get_all_lessons_by_filter(lesson: RBLesson = Depends()) -> list[SLesso
 async def get_lesson_by_id(lesson_id: int) -> SLessonGet | dict:
     check_lesson = await LessonDAO.find_all_data(lesson_id=lesson_id)
     if check_lesson is None:
-        return {"message": f"Занятие с ID {lesson_id} не найдено!"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Занятие с ID {lesson_id} не найдено!")
     return check_lesson
 
 
@@ -32,7 +34,8 @@ async def add_new_lesson(lesson: SLessonAdd) -> dict:
     if check_lesson:
         return {"message": "Занятие успешно добавлено!", "lesson": lesson}
     else:
-        return {"message": "Ошибка при добавлении занятия!"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Ошибка при добавлении занятия!")
 
 
 @router.put("/update_auditorium/", summary="Изменить аудиторию")
@@ -44,7 +47,8 @@ async def update_lesson_auditorium(lesson: SLessonUpdateAuditorium) -> dict:
     if check_lesson:
         return {"message": "Аудитория успешно изменена!", "lesson": lesson}
     else:
-        return {"message": "Ошибка при изменении аудитории!"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Ошибка при изменении аудитории!")
 
 
 @router.delete("/delete_by_id/{lesson_id}/", summary="Удалить занятие по ID")
@@ -53,4 +57,5 @@ async def delete_lesson_by_id(lesson_id: int) -> dict:
     if check_lesson:
         return {"message": f"Занятие с ID {lesson_id} успешно удалено!"}
     else:
-        return {"message": "Ошибка при удалении занятия!"}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                             detail="Ошибка при удалении занятия!")

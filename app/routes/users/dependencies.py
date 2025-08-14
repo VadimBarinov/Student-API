@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from app.config import get_auth_data
 from app.routes.users.dao import UserDAO
-from app.routes.users.models import User
+from app.routes.users.schemas import SUserGet
 
 
 # Функция для получение токена из куки
@@ -58,7 +58,7 @@ async def get_current_user(token: str = Depends(get_token)):
 
 
 # Функция для проверки роли администратора
-async def get_current_admin_user(current_user: User = Depends(get_current_user)):
+async def get_current_admin_user(current_user: SUserGet = Depends(get_current_user)):
     if current_user.is_admin:
         return current_user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Недостаточно прав!")
