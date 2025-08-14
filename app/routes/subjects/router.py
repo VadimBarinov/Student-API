@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
+
+from app.dependencies import SessionDep
 from app.routes.subjects.dao import SubjectDAO
-from app.routes.subjects.rb import RBSubject
+from app.routes.subjects.rb import RBSubjectDep
 from app.routes.subjects.schemas import SSubjectGet, SSubjectAdd, SSubjectUpdateName
 
 router = APIRouter(
@@ -10,8 +12,8 @@ router = APIRouter(
 
 
 @router.get("/", summary="Получить все предметы по фильтру")
-async def get_all_subjects_by_filter(subject: RBSubject = Depends()) -> list[SSubjectGet] | dict:
-    check_subjects = await SubjectDAO.find_all(**subject.to_dict())
+async def get_all_subjects_by_filter(session: SessionDep, subject: RBSubjectDep) -> list[SSubjectGet] | dict:
+    check_subjects = await SubjectDAO.find_all(session=session, **subject.to_dict())
     if check_subjects is None or len(check_subjects) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                         detail="Предметы не найдены!")
@@ -19,8 +21,8 @@ async def get_all_subjects_by_filter(subject: RBSubject = Depends()) -> list[SSu
 
 
 @router.get("/get_by_id/{subject_id}/", summary="Получить предмет по ID")
-async def get_subjects_by_id(subject_id: int) -> SSubjectGet | dict:
-    check_subject = await SubjectDAO.find_one_or_none_by_id(data_id=subject_id)
+async def get_subjects_by_id(session: SessionDep, subject_id: int) -> SSubjectGet | dict:
+    check_subject = await SubjectDAO.find_one_or_none_by_id(session=session, data_id=subject_id)
     if check_subject is None:\
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Предмет с ID {subject_id} не найден!")
@@ -28,8 +30,8 @@ async def get_subjects_by_id(subject_id: int) -> SSubjectGet | dict:
 
 
 @router.post("/add/", summary="Добавить новый предмет")
-async def add_new_subject(subject: SSubjectAdd) -> dict:
-    check_subject = await SubjectDAO.add(**subject.model_dump())
+async def add_new_subject(session: SessionDep, subject: SSubjectAdd) -> dict:
+    check_subject = await SubjectDAO.add(session=session, **subject.model_dump())
     if check_subject:
         return {"message": "Предмет успешно добавлен!", "subject": subject}
     else:
@@ -38,8 +40,9 @@ async def add_new_subject(subject: SSubjectAdd) -> dict:
 
 
 @router.put("/update_name/", summary="Обновить название предмета")
-async def update_subject_name(subject: SSubjectUpdateName) -> dict:
+async def update_subject_name(session: SessionDep, subject: SSubjectUpdateName) -> dict:
     check_subject = await SubjectDAO.update(
+        session=session,
         filter_by={"id": subject.id},
         name=subject.name,
     )
@@ -51,8 +54,8 @@ async def update_subject_name(subject: SSubjectUpdateName) -> dict:
 
 
 @router.delete("/delete/{subject_id}/", summary="Удалить предмет по ID")
-async def delete_subject_by_id(subject_id: int) -> dict:
-    check_subject = await SubjectDAO.delete(id=subject_id)
+async def delete_subject_by_id(session: SessionDep, subject_id: int) -> dict:
+    check_subject = await SubjectDAO.delete(session=session, id=subject_id)
     if check_subject:
         return {"message": f"Предмет с ID {subject_id} успешно удален!"}
     else:

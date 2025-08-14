@@ -1,3 +1,7 @@
+from typing import Annotated
+from fastapi import Depends
+
+
 class RBSubject:
     def __init__(
             self,
@@ -16,3 +20,6 @@ class RBSubject:
             }.items() if value is not None
         }
         return filtered_data
+
+
+RBSubjectDep = Annotated[RBSubject, Depends()]

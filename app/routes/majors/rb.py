@@ -1,3 +1,7 @@
+from typing import Annotated
+from fastapi import Depends
+
+
 class RBMajor:
     def __init__(
             self,
@@ -22,3 +26,6 @@ class RBMajor:
             key: value for key, value in data.items() if value is not None
         }
         return filtered_data
+
+
+RBMajorDep = Annotated[RBMajor, Depends()]

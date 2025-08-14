@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
+
+from app.dependencies import SessionDep
 from app.routes.majors.dao import MajorsDAO
-from app.routes.majors.rb import RBMajor
+from app.routes.majors.rb import RBMajorDep
 from app.routes.majors.schemas import SMajorsAdd, SMajorUpdateDescription, SMajorGet
 
 router = APIRouter(
@@ -9,8 +11,8 @@ router = APIRouter(
 
 
 @router.get("/", summary="Получить все факультеты по фильтру")
-async def get_all_majors(request_body: RBMajor = Depends()) -> list[SMajorGet] | dict:
-    check_major = await MajorsDAO.find_all(**request_body.to_dict())
+async def get_all_majors(session: SessionDep, request_body: RBMajorDep) -> list[SMajorGet] | dict:
+    check_major = await MajorsDAO.find_all(session=session, **request_body.to_dict())
     if check_major is None or len(check_major) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Факультеты не найдены!")
@@ -18,8 +20,8 @@ async def get_all_majors(request_body: RBMajor = Depends()) -> list[SMajorGet] |
 
 
 @router.get("/get_by_id/{major_id}/", summary="Получить один факультет по ID")
-async def get_major_by_id(major_id: int) -> SMajorGet | dict:
-    check_major = await MajorsDAO.find_one_or_none_by_id(data_id=major_id)
+async def get_major_by_id(session: SessionDep, major_id: int) -> SMajorGet | dict:
+    check_major = await MajorsDAO.find_one_or_none_by_id(session=session, data_id=major_id)
     if check_major is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Факультет с ID {major_id} не найден!")
@@ -27,8 +29,8 @@ async def get_major_by_id(major_id: int) -> SMajorGet | dict:
 
 
 @router.get("/get_by_filter/", summary="Получить один факультет по фильтру")
-async def get_major_by_filter(request_body: RBMajor = Depends()) -> SMajorGet | dict:
-    check_major = await MajorsDAO.find_one_or_none(**request_body.to_dict())
+async def get_major_by_filter(session: SessionDep, request_body: RBMajorDep) -> SMajorGet | dict:
+    check_major = await MajorsDAO.find_one_or_none(session=session, **request_body.to_dict())
     if check_major is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Факультет с указанными вами параметрами не найден!")
@@ -36,8 +38,8 @@ async def get_major_by_filter(request_body: RBMajor = Depends()) -> SMajorGet | 
 
 
 @router.post("/add/", summary="Добавить новый факультет")
-async def add_major(major: SMajorsAdd) -> dict:
-    check_major = await MajorsDAO.add(**major.model_dump())
+async def add_major(session: SessionDep, major: SMajorsAdd) -> dict:
+    check_major = await MajorsDAO.add(session=session, **major.model_dump())
     if check_major:
         return {"message": "Факультет успешно добавлен!", "major": major}
     else:
@@ -46,8 +48,9 @@ async def add_major(major: SMajorsAdd) -> dict:
 
 
 @router.put("/update_description/", summary="Обновить описания факультета")
-async def update_major_description(major: SMajorUpdateDescription) -> dict:
+async def update_major_description(session: SessionDep, major: SMajorUpdateDescription) -> dict:
     check_major = await MajorsDAO.update(
+        session=session,
         filter_by={"major_name": major.major_name,},
         major_description=major.major_description
     )
@@ -59,8 +62,8 @@ async def update_major_description(major: SMajorUpdateDescription) -> dict:
 
 
 @router.delete("/delete_by_id/{major_id}/", summary="Удалить факультет по ID")
-async def delete_major(major_id: int) -> dict:
-    check_major = await MajorsDAO.delete(id=major_id)
+async def delete_major(session: SessionDep, major_id: int) -> dict:
+    check_major = await MajorsDAO.delete(session=session, id=major_id)
     if check_major:
         return {"message": f"Факультет с ID {major_id} удален!"}
     else:

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
+from app.dependencies import SessionDep
 from app.routes.weekdays.dao import WeekdayDAO
 from app.routes.weekdays.schemas import SWeekdaysGet
 
@@ -11,8 +12,8 @@ router = APIRouter(
 
 
 @router.get("/", summary="Получить все дни недели")
-async def get_all_weekdays() -> list[SWeekdaysGet]:
-    check_weekdays = await WeekdayDAO.find_all()
+async def get_all_weekdays(session: SessionDep) -> list[SWeekdaysGet]:
+    check_weekdays = await WeekdayDAO.find_all(session=session)
     if check_weekdays is None or len(check_weekdays) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Информация не найдена")

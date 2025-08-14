@@ -1,3 +1,7 @@
+from typing import Annotated
+from fastapi import Depends
+
+
 # Request Body Student
 # Описывает тело запроса
 class RBStudent:
@@ -27,3 +31,6 @@ class RBStudent:
         # Создаем копию словаря, чтобы избежать изменения словаря во время итерации
         filtered_data = {key: value for key, value in data.items() if value is not None}
         return filtered_data
+
+
+RBStudentDep = Annotated[RBStudent, Depends()]

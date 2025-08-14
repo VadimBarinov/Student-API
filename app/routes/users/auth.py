@@ -4,6 +4,7 @@ from asyncpg.pgproto.pgproto import timedelta
 from passlib.context import CryptContext
 from jose import jwt
 from pydantic import EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_auth_data
 from app.routes.users.dao import UserDAO
@@ -37,9 +38,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def authenticate_user(email: EmailStr, password: str):
+async def authenticate_user(session: AsyncSession, email: EmailStr, password: str):
     # Получаем пользователя по E-mail
-    user = await UserDAO.find_one_or_none(email=email)
+    user = await UserDAO.find_one_or_none(session=session, email=email)
     # Проверяем на существование и на совпадение пароля
     if not user or verify_password(plain_password=password, hashed_password=user.password) is False:
         return None

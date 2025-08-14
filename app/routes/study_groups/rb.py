@@ -1,3 +1,7 @@
+from typing import Annotated
+from fastapi import Depends
+
+
 class RBStudyGroup:
     def __init__(
             self,
@@ -16,3 +20,6 @@ class RBStudyGroup:
             "count_students": self.count_students,
         }.items() if value is not None}
         return filtered_data
+
+
+RBStudyGroupDep = Annotated[RBStudyGroup, Depends()]

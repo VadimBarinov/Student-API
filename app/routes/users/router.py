@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Response
-from fastapi.params import Depends
 
 from app.routes.users.auth import get_password_hash, authenticate_user, create_access_token
 from app.routes.users.dao import UserDAO
-from app.routes.users.dependencies import get_current_user, get_current_admin_user
+from app.dependencies import SessionDep, CurrentUser, CurrentAdminUser
 from app.routes.users.schemas import SUserRegister, SUserAuth, SUserGet
 
 router = APIRouter(
@@ -13,8 +12,8 @@ router = APIRouter(
 
 
 @router.post("/register/", summary="Регистрация пользователя")
-async def register_user(user_data: SUserRegister) -> dict:
-    user = await UserDAO.find_one_or_none(email=user_data.email)
+async def register_user(session: SessionDep, user_data: SUserRegister) -> dict:
+    user = await UserDAO.find_one_or_none(session=session, email=user_data.email)
     if user:
         raise HTTPException(
             detail="Пользователь с таким E-mail уже существует",
@@ -27,8 +26,8 @@ async def register_user(user_data: SUserRegister) -> dict:
 
 
 @router.post("/login/", summary="Авторизация пользователя")
-async def auth_user(response: Response, user_data: SUserAuth) -> dict:
-    check_user = await authenticate_user(email=user_data.email, password=user_data.password)
+async def auth_user(response: Response, session: SessionDep, user_data: SUserAuth) -> dict:
+    check_user = await authenticate_user(session=session, email=user_data.email, password=user_data.password)
     if check_user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -42,7 +41,7 @@ async def auth_user(response: Response, user_data: SUserAuth) -> dict:
 
 
 @router.get("/me/", summary="Получение данных о пользователе")
-async def get_me(user_data: SUserGet = Depends(get_current_user)) -> SUserGet:
+async def get_me(session: SessionDep, user_data: CurrentUser) -> SUserGet:
     return user_data
 
 
@@ -53,6 +52,6 @@ async def logout_current_user(response: Response) -> dict:
 
 
 @router.post("/get_all_users/", summary="Получить всех пользователей. Доступно только для администратора")
-async def get_all_users(user_data: SUserGet = Depends(get_current_admin_user)) -> list[SUserGet]:
-    result = await UserDAO.find_all()
+async def get_all_users(session: SessionDep, user_data: CurrentAdminUser) -> list[SUserGet]:
+    result = await UserDAO.find_all(session=session)
     return result
