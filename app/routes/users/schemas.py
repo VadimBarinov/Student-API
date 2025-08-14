@@ -44,3 +44,12 @@ class SUserGet(BaseModel):
         if not re.match(r"^\+\d{5,15}$", values):
             raise ValueError("Номер телефона должен начинаться с '+' и содержать от 5 до 15 цифр")
         return values
+
+
+class SAddOrDeleteRoleToUser(BaseModel):
+    user_id: int = Field(..., description="ID пользователя")
+    role_name: str = Field(
+        ...,
+        examples=["is_user", "is_student", "is_teacher", "is_admin", "is_super_admin",],
+        description="Роль, которую нужно добавить пользователю",
+    )

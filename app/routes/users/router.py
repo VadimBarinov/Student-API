@@ -3,7 +3,8 @@ from fastapi import APIRouter, HTTPException, status, Response
 from app.routes.users.auth import get_password_hash, authenticate_user, create_access_token
 from app.routes.users.dao import UserDAO
 from app.dependencies import SessionDep, CurrentUser, CurrentAdminUser
-from app.routes.users.schemas import SUserRegister, SUserAuth, SUserGet
+from app.routes.users.rb import RBUpdateRolesToUserDep
+from app.routes.users.schemas import SUserRegister, SUserAuth, SUserGet, SAddOrDeleteRoleToUser
 
 router = APIRouter(
     prefix="/auth",
@@ -55,3 +56,53 @@ async def logout_current_user(response: Response) -> dict:
 async def get_all_users(session: SessionDep, user_data: CurrentAdminUser) -> list[SUserGet]:
     result = await UserDAO.find_all(session=session)
     return result
+
+
+@router.post("/add_role_to_user/", summary="Добавить роль пользователю с указанным ID")
+async def add_role_to_user(session: SessionDep, user_data: CurrentAdminUser, user: SAddOrDeleteRoleToUser) -> dict:
+    result = await UserDAO.add_or_delete_role(
+        session=session,
+        user_id=user.user_id,
+        role_name=user.role_name,
+        new_value=True,
+    )
+    if result:
+        return {"message": f"Роль {user.role_name} успешно добавлена пользователю с ID {user.user_id}"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Не удалось добавить роль пользователю. Введены некорректные данные!"
+        )
+
+
+@router.delete("/delete_role_for_user/", summary="Удалить роль пользователю с указанным ID")
+async def delete_role_from_user(session: SessionDep, user_data: CurrentAdminUser, user: SAddOrDeleteRoleToUser) -> dict:
+    result = await UserDAO.add_or_delete_role(
+        session=session,
+        user_id=user.user_id,
+        role_name=user.role_name,
+        new_value=False,
+    )
+    if result:
+        return {"message": f"Роль {user.role_name} успешно удалена у пользователя с ID {user.user_id}"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Не удалось удалить роль у пользователя. Введены некорректные данные!"
+        )
+
+
+@router.put("/update_all_user_roles/", summary="Изменить роли пользователя")
+async def update_all_user_roles(session: SessionDep, user_data: CurrentAdminUser, user: RBUpdateRolesToUserDep) -> dict:
+    result = await UserDAO.update(
+        session=session,
+        filter_by={"id": user.id},
+        **user.to_dict(),
+    )
+    if result:
+        return {"message": f"Роли успешно обновлены у пользователя с ID {user.id}"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Не удалось обновить роли пользователя!"
+        )
