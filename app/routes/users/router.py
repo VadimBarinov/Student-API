@@ -21,7 +21,7 @@ async def register_user(session: SessionDep, user_data: SUserRegister) -> dict:
         )
     user_dict = user_data.model_dump()
     user_dict["password"] = get_password_hash(user_data.password)
-    await UserDAO.add(**user_dict)
+    await UserDAO.add(session=session, **user_dict)
     return {"message": "Вы успешно зарегистрированы!"}
 
 

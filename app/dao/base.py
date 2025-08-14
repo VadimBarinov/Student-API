@@ -2,8 +2,6 @@ from sqlalchemy import select, update as sqlalchemy_update, delete as sqlalchemy
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import async_session_maker
-
 
 class BaseDAO:
     model = None
@@ -39,49 +37,45 @@ class BaseDAO:
     # Метод для добавления новой записи в таблицу
     @classmethod
     async def add(cls, session: AsyncSession, **values):
-        # Начинаем транзакцию
-        async with session.begin():
-            # Создаем новый экземпляр модели
-            new_instance = cls.model(**values)
-            # Добавляем новый экземпляр в сессию
-            session.add(new_instance)
-            try:
-                # Пытаемся зафиксировать изменения в БД
-                await session.commit()
-            except SQLAlchemyError as e:
-                # В случае ошибки откатываем транзакцию и пробрасываем исключение дальше
-                await session.rollback()
-                raise e
-            # Возвращаем созданный экземпляр.
-            return new_instance
+        # Создаем новый экземпляр модели
+        new_instance = cls.model(**values)
+        # Добавляем новый экземпляр в сессию
+        session.add(new_instance)
+        try:
+            # Пытаемся зафиксировать изменения в БД
+            await session.commit()
+        except SQLAlchemyError as e:
+            # В случае ошибки откатываем транзакцию и пробрасываем исключение дальше
+            await session.rollback()
+            raise e
+        # Возвращаем созданный экземпляр.
+        return new_instance
 
     # Метод для изменения поля таблицы
     @classmethod
     async def update(cls, session: AsyncSession, filter_by, **values):
-        # Начинаем транзакцию
-        async with session.begin():
-            # Запрос на обновление записей
-            query = (
-                sqlalchemy_update(cls.model)
-                # Добавляются условия фильтрации, чтобы обновить только те записи,
-                # которые соответствуют заданным условиям
-                .where(*[getattr(cls.model, k) == v for k, v in filter_by.items()])
-                # Устанавливаются новые значения для обновляемых записей
-                .values(**values)
-                # Опция, чтобы синхронизировать состояние сессии с базой данных после выполнения запроса
-                .execution_options(synchronize_session="fetch")
-            )
-            # Выполнение запроса
-            result = await session.execute(query)
-            try:
-                # Сохранение изменений в базе данных
-                await session.commit()
-            except SQLAlchemyError as e:
-                # Транзакция откатывается, если возникает ошибка
-                await session.rollback()
-                raise e
-            # Возвращает количество обновленных строк
-            return result.rowcount
+        # Запрос на обновление записей
+        query = (
+            sqlalchemy_update(cls.model)
+            # Добавляются условия фильтрации, чтобы обновить только те записи,
+            # которые соответствуют заданным условиям
+            .where(*[getattr(cls.model, k) == v for k, v in filter_by.items()])
+            # Устанавливаются новые значения для обновляемых записей
+            .values(**values)
+            # Опция, чтобы синхронизировать состояние сессии с базой данных после выполнения запроса
+            .execution_options(synchronize_session="fetch")
+        )
+        # Выполнение запроса
+        result = await session.execute(query)
+        try:
+            # Сохранение изменений в базе данных
+            await session.commit()
+        except SQLAlchemyError as e:
+            # Транзакция откатывается, если возникает ошибка
+            await session.rollback()
+            raise e
+        # Возвращает количество обновленных строк
+        return result.rowcount
 
     # Метод для удаления
     @classmethod
@@ -90,15 +84,14 @@ class BaseDAO:
         if delete_all == False and not filter_by:
             raise ValueError("Необходимо указать хотя бы один параметр для удаления.")
 
-        async with session.begin():
-            if delete_all:
-                query = sqlalchemy_delete(cls.model)
-            else:
-                query = sqlalchemy_delete(cls.model).filter_by(**filter_by)
-            result = await session.execute(query)
-            try:
-                await session.commit()
-            except SQLAlchemyError as e:
-                await session.rollback()
-                raise e
-            return result.rowcount
+        if delete_all:
+            query = sqlalchemy_delete(cls.model)
+        else:
+            query = sqlalchemy_delete(cls.model).filter_by(**filter_by)
+        result = await session.execute(query)
+        try:
+            await session.commit()
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+        return result.rowcount
