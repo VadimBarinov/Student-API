@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Response
 
-from app.routes.users.auth import get_password_hash, authenticate_user, create_access_token
+from app.routes.users.auth import RefreshTokenSystem
 from app.routes.users.dao import UserDAO
-from app.dependencies import SessionDep, CurrentUser, CurrentAdminUser
+from app.dependencies import SessionDep, CurrentUser, CurrentAdminUser, RefreshTokenDep
 from app.routes.users.rb import RBUpdateRolesToUserDep
 from app.routes.users.schemas import SUserRegister, SUserAuth, SUserGet, SAddOrDeleteRoleToUser
 
@@ -14,6 +14,7 @@ router = APIRouter(
 
 @router.post("/register/", summary="Регистрация пользователя")
 async def register_user(session: SessionDep, user_data: SUserRegister) -> dict:
+    token_system = RefreshTokenSystem()
     user = await UserDAO.find_one_or_none(session=session, email=user_data.email)
     if user:
         raise HTTPException(
@@ -21,24 +22,40 @@ async def register_user(session: SessionDep, user_data: SUserRegister) -> dict:
             status_code=status.HTTP_409_CONFLICT,
         )
     user_dict = user_data.model_dump()
-    user_dict["password"] = get_password_hash(user_data.password)
+    user_dict["password"] = token_system.get_password_hash(user_data.password)
     await UserDAO.add(session=session, **user_dict)
     return {"message": "Вы успешно зарегистрированы!"}
 
 
 @router.post("/login/", summary="Авторизация пользователя")
 async def auth_user(response: Response, session: SessionDep, user_data: SUserAuth) -> dict:
-    check_user = await authenticate_user(session=session, email=user_data.email, password=user_data.password)
+    token_system = RefreshTokenSystem()
+    check_user = await token_system.authenticate_user(
+        session=session,
+        email=user_data.email,
+        password=user_data.password
+    )
     if check_user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неверная почта или пароль"
         )
     # Если данные пользователя получены, то генерируем JWT токен
-    access_token = create_access_token({"sub": str(check_user.id)})
+    token_pair = token_system.create_token_pair(check_user.id)
     # Записываем сгенерированный токен в куку
-    response.set_cookie(key="user_access_token", value=access_token, httponly=True)
-    return {"access_token": access_token, "refresh_token": None}
+    for key, value in token_pair.items():
+        response.set_cookie(key=key, value=value, httponly=True)
+    return token_pair
+
+
+@router.get("/refresh/", summary="Refresh access token")
+async def refresh_access_token(response: Response, refresh_token: RefreshTokenDep) -> dict:
+    token_system = RefreshTokenSystem()
+    token_pair = token_system.refresh_access_token(refresh_token=refresh_token)
+    # Обновляем токен в куки
+    for key, value in token_pair.items():
+        response.set_cookie(key=key, value=value, httponly=True)
+    return token_pair
 
 
 @router.get("/me/", summary="Получение данных о пользователе")
@@ -48,7 +65,10 @@ async def get_me(session: SessionDep, user_data: CurrentUser) -> SUserGet:
 
 @router.post("/logout/", summary="Выйти из системы")
 async def logout_current_user(response: Response) -> dict:
-    response.delete_cookie(key="user_access_token")
+    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="refresh_token")
+    response.delete_cookie(key="token_type")
+    response.delete_cookie(key="expires_in")
     return {"message": "Пользователь успешно вышел из системы!"}
 
 
